@@ -9,7 +9,7 @@ import StatsBase
 # CR should be 0.1 < CR < 1.0; higher speeds convergence
 # np should be between 5 and 10 * dimensionality; must be at least 4
 # see https://doi.org/10.1023/A:1008202821328
-function diffevo(fo, d; F=0.8, CR=0.7, np=d*5, maxiter=1000)
+function diffevo(fo, d; F=0.8, CR=0.7, np=d*7, maxiter=1000)
     x = rand(Float64, (d, np))
     f = fo(x)
     im = argmin(f)

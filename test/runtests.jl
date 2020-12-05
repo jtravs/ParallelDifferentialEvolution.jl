@@ -11,7 +11,7 @@ using Test
         x = bounds(x)
         [sum(x[:,j].^2) / length(x) for j = 1:size(x,2)]
     end
-    m, fitness, track = diffevo(f, 1, np=10)
+    m, fitness, track = diffevo(f, 1)
     @test isapprox(bounds(m)[1], 0.0, atol=1e-30)
     @test isapprox(fitness, 0.0, atol=1e-30)
     m, fitness, track = diffevo(f, 3)
