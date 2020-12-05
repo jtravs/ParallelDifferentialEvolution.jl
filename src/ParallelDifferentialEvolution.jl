@@ -31,7 +31,7 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*7, maxiter=1000)
         for j in 1:np
             if tf[j] < f[j]
                 f[j] = tf[j]
-                x[:,j] = trials[:,j]
+                x[:,j] .= trials[:,j]
                 if f[j] < f[im]
                     im = j
                     m = trials[:,j]
