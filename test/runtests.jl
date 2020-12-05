@@ -1,5 +1,6 @@
 using ParallelDifferentialEvolution
 using Test
+using Distributed
 
 @testset "ParallelDifferentialEvolution.jl" begin
     function bounds(x)
@@ -12,6 +13,10 @@ using Test
     @test isapprox(bounds(m)[1], 0.0, atol=1e-14)
     @test isapprox(fitness, 0.0, atol=1e-14)
     m, fitness, track = diffevo(f, 3)
+    @test all(isapprox.(bounds(m), 0.0, atol=1e-14))
+    @test isapprox(fitness, 0.0, atol=1e-14)
+    g(x) = pmap(xi -> sum(bounds(xi).^2) / length(xi), x)
+    m, fitness, track = diffevo(f, 10, maxiter=2000)
     @test all(isapprox.(bounds(m), 0.0, atol=1e-14))
     @test isapprox(fitness, 0.0, atol=1e-14)
 end
