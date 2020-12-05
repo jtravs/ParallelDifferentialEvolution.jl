@@ -2,6 +2,7 @@ module ParallelDifferentialEvolution
 export diffevo
 
 import StatsBase
+import Logging
 
 # fo must iterate over individuals and return an array of fitnesses
 # we minimise this fitness
@@ -40,6 +41,8 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*7, maxiter=1000)
             end
         end
         push!(track, (m, f[im]))
+        @info "generation: $i:"   track[end]
+        flush(stdout)
     end
     m, f[im], track
 end
