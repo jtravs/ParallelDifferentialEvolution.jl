@@ -7,10 +7,7 @@ using Test
         maxx = 10.0
         x .* (maxx .- minx) .+ minx
     end
-    function f(x)
-        x = bounds(x)
-        [sum(x[:,j].^2) / length(x) for j = 1:size(x,2)]
-    end
+    f(x) = map(xi -> sum(bounds(xi).^2) / length(xi), x)
     m, fitness, track = diffevo(f, 1)
     @test isapprox(bounds(m)[1], 0.0, atol=1e-14)
     @test isapprox(fitness, 0.0, atol=1e-14)
