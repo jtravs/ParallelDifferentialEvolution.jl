@@ -3,6 +3,7 @@ export diffevo
 
 import StatsBase
 import Logging
+import Statistics: mean, std
 
 # fo must iterate over individuals and return an array of fitnesses
 # we minimise this fitness
@@ -17,7 +18,7 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*7, maxiter=1000)
     im = argmin(f)
     m = x[im]
     trials = similar(x)
-    track = [(m, f[im])]
+    track = [(m, f[im], mean(f), std(f))]
     for i in 1:maxiter
         for j in 1:np
             ii = [k for k in 1:np if k != j]
@@ -40,9 +41,10 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*7, maxiter=1000)
                 end
             end
         end
-        push!(track, (m, f[im]))
-        @info "generation: $i:"   track[end]
+        push!(track, (m, f[im], mean(f), std(f)))
+        @info "generation: $i:" track[end]
         flush(stdout)
+        flush(stderr)
     end
     m, f[im], track
 end
