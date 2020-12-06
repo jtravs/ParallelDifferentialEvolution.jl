@@ -34,7 +34,8 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
     m = x[im]
     trials = similar(x)
     stime = Dates.now()
-    for gen in 1:maxiter
+    gen = 1
+    while gen <= maxiter
         for j in 1:np
             ii = [k for k in 1:np if k != j]
             a, b, c = x[StatsBase.sample(ii, 3, replace=false)]
@@ -56,16 +57,20 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
                 end
             end
         end
-        con = std(f) / (atol + rtol*abs(mean(f)))
-        etime = floor(Dates.now() - stime, Dates.Second)
+        global con = std(f) / (atol + rtol*abs(mean(f)))
+        global etime = floor(Dates.now() - stime, Dates.Second)
         cb(gen, x, im, f, con, etime)
         if con < 1.0
            @info "converged on generation $gen"
-           return m, f[im], etime
+           break
         end
+        gen += 1
     end
-    @info "maximum number of $gen iterations reached"
-    m, f[im], etime
+    if con >= 1.0
+        @info "maximum number of $gen iterations reached"
+    end
+    return (F=F, CR=CR, np=np, maxiter=maxiter, gen=gen, rtol=rtol, atol=atol,
+            m=m, f=f, fm=f[im], etime=etime, x=x, im=im, con=con)
 end
 
 end
