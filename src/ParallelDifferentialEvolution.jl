@@ -14,10 +14,6 @@ function logcb(gen, x, im, f, con)
     flush(stderr)
 end
 
-function evaluate(fo, bounds, x, fmap)
-    fmap(xi -> fo(bounds(xi)), x)
-end
-
 # fo is the objective function (must be @everywhere for distributed use) 
 # we minimise the fitness
 # bounds translates each parameter from [0, 1] to [min, max]
@@ -29,10 +25,10 @@ end
 # rtol and atol set convergence tolerance: std(f) < (atol + rtol*abs(mean(f)))
 # cb is a callback to use after eacg generation: defaulst to null, logcb prints stats
 # fmap is the map to use to evaluate fitness: either `map` or `pmap`
-function diffevo(fo, bounds, d; F=0.8, CR=0.7, np=d*10,
+function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
                  maxiter=1000, rtol=1e-3, atol=1e-14, cb=nullcb, fmap=map)
     x = [rand(d) for i in 1:np]
-    f = evaluate(fo, bounds, x, fmap)
+    f = fmap(fo, x)
     im = argmin(f)
     m = x[im]
     trials = similar(x)
@@ -47,7 +43,7 @@ function diffevo(fo, bounds, d; F=0.8, CR=0.7, np=d*10,
             end
             trials[j] = ifelse.(cp, mut, x[j])
         end
-        tf = evaluate(fo, bounds, trials, fmap)
+        tf = fmap(fo, trials)
         for j in 1:np
             if tf[j] < f[j]
                 f[j] = tf[j]

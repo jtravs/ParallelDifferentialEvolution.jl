@@ -8,20 +8,20 @@ import Distributed: pmap
         maxx = 10.0
         x .* (maxx .- minx) .+ minx
     end
-    f(x) = sum(x.^2) / length(x)
-    m, fitness = diffevo(f, bounds, 1)
+    f(x) = sum(bounds(x).^2) / length(x)
+    m, fitness = diffevo(f, 1)
     @test isapprox(bounds(m)[1], 0.0, atol=1e-6)
     @test isapprox(fitness, 0.0, atol=1e-13)
-    m, fitness = diffevo(f, bounds, 1, cb=logcb)
+    m, fitness = diffevo(f, 1, cb=logcb)
     @test isapprox(bounds(m)[1], 0.0, atol=1e-6)
     @test isapprox(fitness, 0.0, atol=1e-13)
-    m, fitness = diffevo(f, bounds, 3)
+    m, fitness = diffevo(f, 3)
     @test all(isapprox.(bounds(m), 0.0, atol=1e-6))
     @test isapprox(fitness, 0.0, atol=1e-13)
-    m, fitness = diffevo(f, bounds, 10, maxiter=2000)
+    m, fitness = diffevo(f, 10, maxiter=2000)
     @test all(isapprox.(bounds(m), 0.0, atol=1e-6))
     @test isapprox(fitness, 0.0, atol=1e-13)
-    m, fitness = diffevo(f, bounds, 10, maxiter=2000, fmap=pmap)
+    m, fitness = diffevo(f, 10, maxiter=2000, fmap=pmap)
     @test all(isapprox.(bounds(m), 0.0, atol=1e-6))
     @test isapprox(fitness, 0.0, atol=1e-13)
 end
