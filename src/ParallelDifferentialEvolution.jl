@@ -4,12 +4,13 @@ export diffevo, nullcb, logcb
 import StatsBase
 import Logging
 import Statistics: mean, std
+import Dates
 
-function nullcb(gen, x, im, f, con)
+function nullcb(gen, x, im, f, con, etime)
 end
 
-function logcb(gen, x, im, f, con)
-    @info "generation: $gen; convergence: $con" x[im], f[im], mean(f), std(f)
+function logcb(gen, x, im, f, con, etime)
+    @info "generation: $gen; convergence: $con; elapsed time: $etime" x[im], f[im], mean(f), std(f)
     flush(stdout)
     flush(stderr)
 end
@@ -32,6 +33,7 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
     im = argmin(f)
     m = x[im]
     trials = similar(x)
+    stime = Dates.now()
     for gen in 1:maxiter
         for j in 1:np
             ii = [k for k in 1:np if k != j]
@@ -55,14 +57,15 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
             end
         end
         con = std(f) / (atol + rtol*abs(mean(f)))
-        cb(gen, x, im, f, con)
+        etime = floor(Dates.now() - stime, Dates.Second)
+        cb(gen, x, im, f, con, etime)
         if con < 1.0
            @info "converged on generation $gen"
-           return m, f[im]
+           return m, f[im], etime
         end
     end
     @info "maximum number of $gen iterations reached"
-    m, f[im]
+    m, f[im], etime
 end
 
 end
