@@ -5,6 +5,7 @@ import StatsBase
 import Logging
 import Statistics: mean, std
 import Dates
+import LatinHypercubeSampling
 
 function nullcb(gen, x, im, f, con, etime)
 end
@@ -28,7 +29,8 @@ end
 # fmap is the map to use to evaluate fitness: either `map` or `pmap`
 function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
                  maxiter=1000, rtol=1e-3, atol=1e-14, cb=nullcb, fmap=map)
-    x = [rand(d) for i in 1:np]
+    plan, _ = LatinHypercubeSampling.LHCoptim(np, d, 1000)
+    x = mapslices(x->[x], scaleLHC(plan, repeat([(0.0,1.0)], d)), dims=2)
     f = fmap(fo, x)
     im = argmin(f)
     m = x[im]
