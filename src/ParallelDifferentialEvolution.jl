@@ -27,10 +27,11 @@ end
 # rtol and atol set convergence tolerance: std(f) < (atol + rtol*abs(mean(f)))
 # cb is a callback to use after eacg generation: defaulst to null, logcb prints stats
 # fmap is the map to use to evaluate fitness: either `map` or `pmap`
-function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
+function diffevo(fo, d; F=0.8, CR=0.6, np=d*10,
                  maxiter=1000, rtol=1e-3, atol=1e-14, cb=nullcb, fmap=map)
     plan, _ = LatinHypercubeSampling.LHCoptim(np, d, 1000)
-    x = mapslices(x->[x], scaleLHC(plan, repeat([(0.0,1.0)], d)), dims=2)
+    plan = LatinHypercubeSampling.scaleLHC(plan, repeat([(0.0,1.0)], d))
+    x = mapslices(x->[x], plan, dims=2)
     f = fmap(fo, x)
     im = argmin(f)
     m = x[im]
@@ -41,7 +42,8 @@ function diffevo(fo, d; F=0.8, CR=0.7, np=d*10,
         for j in 1:np
             ii = [k for k in 1:np if k != j]
             a, b, c = x[StatsBase.sample(ii, 3, replace=false)]
-            mut = clamp.(a .+ F .* (b .- c), 0.0, 1.0)
+            dither = F + rand()*(1 - F)
+            mut = clamp.(a .+ dither .* (b .- c), 0.0, 1.0)
             cp = rand(d) .< CR
             if !any(cp)
                 cp[rand(1:d)] = true
