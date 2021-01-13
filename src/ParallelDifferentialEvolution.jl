@@ -27,11 +27,18 @@ end
 # rtol and atol set convergence tolerance: std(f) < (atol + rtol*abs(mean(f)))
 # cb is a callback to use after eacg generation: defaulst to null, logcb prints stats
 # fmap is the map to use to evaluate fitness: either `map` or `pmap`
+# seeds can be a list of individuals to insert into the initial population
 function diffevo(fo, d; F=0.8, CR=0.6, np=d*10,
-                 maxiter=1000, rtol=1e-3, atol=1e-14, cb=nullcb, fmap=map)
+                 maxiter=1000, rtol=1e-3, atol=1e-14, cb=nullcb, fmap=map,
+                 seeds=nothing)
     plan, _ = LatinHypercubeSampling.LHCoptim(np, d, 1000)
     plan = LatinHypercubeSampling.scaleLHC(plan, repeat([(0.0,1.0)], d))
     x = mapslices(x->[x], plan, dims=2)
+    if !isnothing(seeds)
+        for (i,seed) in enumerate(seeds)
+            x[i] = seed
+        end
+    end
     f = fmap(fo, x)
     im = argmin(f)
     m = x[im]

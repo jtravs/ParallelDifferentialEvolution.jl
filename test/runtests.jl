@@ -24,4 +24,7 @@ import Distributed: pmap
     res = diffevo(f, 10, maxiter=2000, fmap=pmap)
     @test all(isapprox.(bounds(res.m), 0.0, atol=1e-6))
     @test isapprox(res.fm, 0.0, atol=1e-13)
+    res = diffevo(f, 3, seeds=[[0.2,0.1,0.9], [0.7,0.2,0.8]])
+    @test all(isapprox.(bounds(res.m), 0.0, atol=1e-6))
+    @test isapprox(res.fm, 0.0, atol=1e-13)
 end
